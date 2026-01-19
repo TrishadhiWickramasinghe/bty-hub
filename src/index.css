@@ -1,12 +1,17 @@
-/* BTY-HUB - Global Index Styles */
+/* BTY-HUB - Global Index Styles with Modern Brown Theme */
 
-/* ==================== CSS RESET ==================== */
-/* Modern CSS Reset */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
+/* ==================== IMPORT THEME & COMPONENTS ==================== */
+@import './styles/theme.css';
+@import './styles/hero.css';
+@import './styles/navbar.css';
+@import './styles/admin-header.css';
+@import './styles/sidebar.css';
+@import './styles/product-card.css';
+@import './styles/footer.css';
+@import './styles/buttons.css';
+@import './styles/forms.css';
+@import './styles/cards.css';
+@import './styles/utilities.css';
 
 /* Remove default margin */
 body,

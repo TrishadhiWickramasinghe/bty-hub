@@ -76,72 +76,91 @@ const Home = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-primary text-white py-5 mb-5">
+      <section className="hero-section">
         <div className="container">
-          <div className="row align-items-center">
-            <div className="col-md-6">
-              <h1 className="display-4 fw-bold">Welcome to BTY-HUB</h1>
-              <p className="lead">Discover amazing products at unbeatable prices</p>
-              <a href="/products" className="btn btn-light btn-lg mt-3">
-                Shop Now
-              </a>
+          <div className="hero-content">
+            <div className="hero-text">
+              <h1>Discover Premium <span className="highlight">Products</span></h1>
+              <p>Shop the finest selection of products handpicked just for you. Experience quality, style, and excellence.</p>
+              <div className="hero-features">
+                <div className="hero-feature">
+                  <div className="hero-feature-icon">✓</div>
+                  <div className="hero-feature-text">
+                    <h4>Premium Quality</h4>
+                    <p>Carefully selected premium products</p>
+                  </div>
+                </div>
+                <div className="hero-feature">
+                  <div className="hero-feature-icon">✓</div>
+                  <div className="hero-feature-text">
+                    <h4>Fast Shipping</h4>
+                    <p>Quick delivery to your doorstep</p>
+                  </div>
+                </div>
+                <div className="hero-feature">
+                  <div className="hero-feature-icon">✓</div>
+                  <div className="hero-feature-text">
+                    <h4>Secure Checkout</h4>
+                    <p>Safe and secure payment processing</p>
+                  </div>
+                </div>
+              </div>
+              <button className="btn-cta mt-3">Shop Now</button>
             </div>
-            <div className="col-md-6">
-              <img 
-                src="https://via.placeholder.com/500x300" 
-                alt="Hero" 
-                className="img-fluid rounded shadow"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="container mb-5">
-        <div className="row g-4">
-          <div className="col-md-4">
-            <div className="text-center p-4 border rounded bg-white">
-              <FaShippingFast size={40} className="text-primary mb-3" />
-              <h4>Free Shipping</h4>
-              <p className="text-muted">On orders over $50</p>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="text-center p-4 border rounded bg-white">
-              <FaTags size={40} className="text-primary mb-3" />
-              <h4>Best Prices</h4>
-              <p className="text-muted">Guaranteed lowest prices</p>
-            </div>
-          </div>
-          <div className="col-md-4">
-            <div className="text-center p-4 border rounded bg-white">
-              <FaFire size={40} className="text-primary mb-3" />
-              <h4>Hot Deals</h4>
-              <p className="text-muted">Daily flash sales</p>
+            <div className="hero-image">
+              <img src="https://via.placeholder.com/400x400" alt="Featured Product" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="container mb-5">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="h3">
-            <FaFire className="text-danger me-2" />
-            Featured Products
-          </h2>
-          <a href="/products" className="btn btn-outline-primary">
-            View All Products
-          </a>
+      {/* Featured Products Section */}
+      <section className="section-light">
+        <div className="container">
+          <h2 className="section-title">Featured <span className="highlight">Products</span></h2>
+          <p className="section-subtitle">Discover our most popular items handpicked for you</p>
+          
+          <div className="product-grid">
+            {featuredProducts.map(product => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         </div>
-        
-        <div className="row g-4">
-          {featuredProducts.map(product => (
-            <div key={product.id} className="col-md-3 col-sm-6">
-              <ProductCard product={product} />
-            </div>
-          ))}
+      </section>
+
+      {/* CTA Banner */}
+      <div className="container">
+        <div className="cta-banner">
+          <div className="cta-banner-content">
+            <h2>Limited Time Offer</h2>
+            <p>Get exclusive discounts on your favorite products. Shop now and save up to 40%!</p>
+            <button className="btn-cta">Explore Deals</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Categories Section */}
+      <section className="section-dark py-5">
+        <div className="container">
+          <h2 className="section-title" style={{color: 'white'}}>Shop by <span className="highlight">Category</span></h2>
+          <p className="section-subtitle" style={{color: 'rgba(255, 255, 255, 0.7)'}}>Browse our wide selection of products</p>
+          
+          <div className="gallery-section">
+            {categories.map((cat, idx) => (
+              <div key={idx} className="gallery-item">
+                <img 
+                  src="https://via.placeholder.com/300x300" 
+                  alt={cat.name}
+                />
+                <div className="gallery-item-overlay">
+                  <div className="gallery-item-overlay-content">
+                    <div className="gallery-item-overlay-icon">📦</div>
+                    <div className="gallery-item-overlay-text">{cat.name}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

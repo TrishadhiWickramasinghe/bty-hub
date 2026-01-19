@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useCart } from '../../context/CartContext';
+import '../../styles/navbar.css';
 import { FaShoppingCart, FaUser, FaSignOutAlt, FaHome, FaStore, FaChartBar } from 'react-icons/fa';
 
 const Navbar = () => {

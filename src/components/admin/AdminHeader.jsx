@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import '../../styles/admin-header.css';
 import { 
   FaBars, 
   FaTimes, 

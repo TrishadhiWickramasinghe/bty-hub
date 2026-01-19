@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCart } from '../../context/CartContext';
+import '../../styles/product-card.css';
 import { toast } from 'react-toastify';
 import { 
   FaTrash, 

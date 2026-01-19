@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import '../../styles/product-card.css';
 import { FaShoppingCart, FaStar } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
