@@ -1,151 +1,141 @@
-// Mock data for orders
-let orders = [
-  {
-    id: 'ORD-001',
-    userId: 1,
-    customer: 'John Smith',
-    email: 'john@example.com',
-    phone: '+1 (555) 123-4567',
-    items: [
-      { id: 1, name: 'Premium Laptop', quantity: 1, price: 1299.99 },
-      { id: 2, name: 'Wireless Mouse', quantity: 2, price: 29.99 }
-    ],
-    subtotal: 1359.97,
-    shipping: 0,
-    tax: 108.80,
-    total: 1468.77,
-    status: 'processing',
-    paymentMethod: 'credit_card',
-    shippingAddress: '123 Main St, New York, NY 10001',
-    billingAddress: '123 Main St, New York, NY 10001',
-    notes: 'Please deliver before 5 PM',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-15T10:30:00Z'
-  }
-];
+// Order Service for BTY-HUB
+// Integrated with FastAPI backend running on localhost:8000
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+// Helper to get authorization header
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('access_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
 
 const orderService = {
-  // Get all orders
+  // ==================== ORDERS ====================
+  
+  /**
+   * Get all orders with filters
+   */
   getAllOrders: async (filters = {}) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filteredOrders = [...orders];
-    
-    // Apply filters
-    if (filters.status) {
-      filteredOrders = filteredOrders.filter(order => order.status === filters.status);
-    }
-    
-    if (filters.customerId) {
-      filteredOrders = filteredOrders.filter(order => order.userId === filters.customerId);
-    }
-    
-    if (filters.startDate && filters.endDate) {
-      filteredOrders = filteredOrders.filter(order => {
-        const orderDate = new Date(order.createdAt);
-        return orderDate >= new Date(filters.startDate) && orderDate <= new Date(filters.endDate);
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (filters.status) queryParams.append('status', filters.status);
+      if (filters.skip) queryParams.append('skip', filters.skip);
+      if (filters.limit) queryParams.append('limit', filters.limit || 10);
+      
+      const response = await fetch(`${API_BASE_URL}/orders?${queryParams}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch orders');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to fetch orders');
     }
-    
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      filteredOrders = filteredOrders.filter(order =>
-        order.id.toLowerCase().includes(searchTerm) ||
-        order.customer.toLowerCase().includes(searchTerm) ||
-        order.email.toLowerCase().includes(searchTerm)
-      );
-    }
-    
-    // Apply sorting
-    filteredOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
-    return filteredOrders;
   },
 
-  // Get order by ID
+  /**
+   * Get order by ID
+   */
   getOrderById: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const order = orders.find(o => o.id === id);
-    if (!order) throw new Error('Order not found');
-    return order;
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/${id}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Order not found');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to fetch order');
+    }
   },
 
-  // Create new order
+  /**
+   * Create new order
+   */
   createOrder: async (orderData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const newOrder = {
-      id: `ORD-${String(orders.length + 1).padStart(3, '0')}`,
-      ...orderData,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    orders.push(newOrder);
-    return newOrder;
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to create order');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to create order');
+    }
   },
 
-  // Update order status
+  /**
+   * Update order status (Admin only)
+   */
   updateOrderStatus: async (id, status) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const order = orders.find(o => o.id === id);
-    if (!order) throw new Error('Order not found');
-    
-    order.status = status;
-    order.updatedAt = new Date().toISOString();
-    return order;
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/${id}/status`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ status })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to update order status');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to update order status');
+    }
   },
 
-  // Cancel order
+  /**
+   * Update payment status (Admin only)
+   */
+  updatePaymentStatus: async (id, payment_status) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/${id}/payment`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ payment_status })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to update payment status');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to update payment status');
+    }
+  },
+
+  /**
+   * Cancel order
+   */
   cancelOrder: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const order = orders.find(o => o.id === id);
-    if (!order) throw new Error('Order not found');
-    
-    order.status = 'cancelled';
-    order.updatedAt = new Date().toISOString();
-    return order;
-  },
-
-  // Get user orders
-  getUserOrders: async (userId) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const userOrders = orders.filter(order => order.userId === userId);
-    return userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  },
-
-  // Delete order (admin only)
-  deleteOrder: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const index = orders.findIndex(o => o.id === id);
-    if (index === -1) throw new Error('Order not found');
-    
-    orders.splice(index, 1);
-    return true;
-  },
-
-  // Get order statistics
-  getOrderStats: async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    const today = new Date();
-    const lastWeek = new Date(today);
-    lastWeek.setDate(lastWeek.getDate() - 7);
-    
-    const recentOrders = orders.filter(order => 
-      new Date(order.createdAt) >= lastWeek
-    );
-    
-    return {
-      total: orders.length,
-      pending: orders.filter(o => o.status === 'pending').length,
-      processing: orders.filter(o => o.status === 'processing').length,
-      shipped: orders.filter(o => o.status === 'shipped').length,
-      delivered: orders.filter(o => o.status === 'delivered').length,
-      cancelled: orders.filter(o => o.status === 'cancelled').length,
-      totalRevenue: orders.reduce((sum, order) => sum + order.total, 0),
-      recentCount: recentOrders.length,
-      recentRevenue: recentOrders.reduce((sum, order) => sum + order.total, 0)
-    };
+    try {
+      return await orderService.updateOrderStatus(id, 'cancelled');
+    } catch (error) {
+      throw new Error(error.message || 'Failed to cancel order');
+    }
   }
 };
 

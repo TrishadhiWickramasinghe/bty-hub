@@ -11,8 +11,8 @@ import {
   FaBox, 
   FaInfoCircle,
   FaPlus,
-  FaMinus,
   FaTrash,
+  FaTimes,
   FaArrowLeft,
   FaSave
 } from 'react-icons/fa';

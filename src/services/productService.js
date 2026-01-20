@@ -1,98 +1,173 @@
-// Mock data - replace with actual API calls
-const products = [
-  {
-    id: 1,
-    name: 'Premium Laptop',
-    description: 'High-performance laptop for professionals',
-    price: 1299.99,
-    category: 'Electronics',
-    stock: 45,
-    rating: 4.8,
-    image: 'https://via.placeholder.com/300',
-    createdAt: '2024-01-01'
-  },
-  // Add more products as needed
-];
+// Product Service for BTY-HUB
+// Integrated with FastAPI backend running on localhost:8000
+
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8000/api/v1';
+
+// Helper to get authorization header
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('access_token');
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};
 
 const productService = {
-  // Get all products
+  // ==================== PRODUCTS ====================
+  
+  /**
+   * Get all products with filters
+   */
   getAllProducts: async (filters = {}) => {
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filteredProducts = [...products];
-    
-    // Apply filters
-    if (filters.category) {
-      filteredProducts = filteredProducts.filter(p => 
-        p.category.toLowerCase() === filters.category.toLowerCase()
-      );
+    try {
+      const queryParams = new URLSearchParams();
+      
+      if (filters.category_id) queryParams.append('category_id', filters.category_id);
+      if (filters.skip) queryParams.append('skip', filters.skip);
+      if (filters.limit) queryParams.append('limit', filters.limit || 10);
+      if (filters.search) queryParams.append('search', filters.search);
+      
+      const response = await fetch(`${API_BASE_URL}/products?${queryParams}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to fetch products');
     }
-    
-    if (filters.minPrice) {
-      filteredProducts = filteredProducts.filter(p => p.price >= filters.minPrice);
-    }
-    
-    if (filters.maxPrice) {
-      filteredProducts = filteredProducts.filter(p => p.price <= filters.maxPrice);
-    }
-    
-    if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
-      filteredProducts = filteredProducts.filter(p =>
-        p.name.toLowerCase().includes(searchLower) ||
-        p.description.toLowerCase().includes(searchLower)
-      );
-    }
-    
-    return filteredProducts;
   },
 
-  // Get product by ID
+  /**
+   * Get product by ID
+   */
   getProductById: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const product = products.find(p => p.id === parseInt(id));
-    if (!product) throw new Error('Product not found');
-    return product;
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Product not found');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to fetch product');
+    }
   },
 
-  // Create product (admin)
+  /**
+   * Create product (Admin only)
+   */
   createProduct: async (productData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const newProduct = {
-      id: products.length + 1,
-      ...productData,
-      createdAt: new Date().toISOString().split('T')[0]
-    };
-    products.push(newProduct);
-    return newProduct;
+    try {
+      const response = await fetch(`${API_BASE_URL}/products`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(productData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to create product');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to create product');
+    }
   },
 
-  // Update product (admin)
+  /**
+   * Update product (Admin only)
+   */
   updateProduct: async (id, productData) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const index = products.findIndex(p => p.id === parseInt(id));
-    if (index === -1) throw new Error('Product not found');
-    
-    products[index] = { ...products[index], ...productData };
-    return products[index];
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(productData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to update product');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to update product');
+    }
   },
 
-  // Delete product (admin)
+  /**
+   * Delete product (Admin only)
+   */
   deleteProduct: async (id) => {
-    await new Promise(resolve => setTimeout(resolve, 500));
-    const index = products.findIndex(p => p.id === parseInt(id));
-    if (index === -1) throw new Error('Product not found');
-    
-    products.splice(index, 1);
-    return true;
+    try {
+      const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete product');
+      }
+
+      return true;
+    } catch (error) {
+      throw new Error(error.message || 'Failed to delete product');
+    }
   },
 
-  // Get product categories
+  // ==================== CATEGORIES ====================
+  
+  /**
+   * Get all categories
+   */
   getCategories: async () => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const categories = [...new Set(products.map(p => p.category))];
-    return categories;
+    try {
+      const response = await fetch(`${API_BASE_URL}/categories`, {
+        method: 'GET',
+        headers: getAuthHeaders()
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch categories');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to fetch categories');
+    }
+  },
+
+  /**
+   * Create category (Admin only)
+   */
+  createCategory: async (categoryData) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/categories`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(categoryData)
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || 'Failed to create category');
+      }
+
+      return await response.json();
+    } catch (error) {
+      throw new Error(error.message || 'Failed to create category');
+    }
   }
 };
 
