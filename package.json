@@ -54,8 +54,8 @@
     "webpack-bundle-analyzer": "^4.10.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node init && react-scripts start",
+    "build": "node init && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "test:watch": "react-scripts test --watchAll",
@@ -68,8 +68,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "analyze": "cross-env ANALYZE=true npm run build",
-    "build:analyze": "npm run build && npm run analyze",
-    "start:prod": "serve -s build",
+    "build:analyze": "node init && npm run build && npm run analyze",
+    "start:prod": "node init && serve -s build",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "prepare": "husky install"
